@@ -1,0 +1,343 @@
+basePath: /api/v1
+definitions:
+  models.CreateItemRequest:
+    properties:
+      name:
+        example: Laptop
+        maxLength: 255
+        minLength: 1
+        type: string
+      price:
+        example: 999.99
+        minimum: 0
+        type: number
+      stock:
+        example: 50
+        minimum: 0
+        type: integer
+    required:
+    - name
+    - price
+    - stock
+    type: object
+  models.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  models.Item:
+    properties:
+      created_at:
+        format: date-time
+        type: string
+      deleted_at:
+        format: date-time
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Laptop
+        maxLength: 255
+        minLength: 1
+        type: string
+      price:
+        example: 999.99
+        minimum: 0
+        type: number
+      stock:
+        example: 50
+        minimum: 0
+        type: integer
+      updated_at:
+        format: date-time
+        type: string
+    required:
+    - name
+    - price
+    - stock
+    type: object
+  models.PaginatedResponse:
+    properties:
+      has_more:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/models.Item'
+        type: array
+      next_cursor:
+        type: string
+      total:
+        type: integer
+    type: object
+  models.UpdateItemRequest:
+    properties:
+      name:
+        example: Updated Laptop
+        maxLength: 255
+        minLength: 1
+        type: string
+      price:
+        example: 1099.99
+        minimum: 0
+        type: number
+      stock:
+        example: 75
+        minimum: 0
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A comprehensive inventory management system with CRUD operations, pagination,
+    filtering, sorting, and rate limiting
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Inventory Management API
+  version: "1.0"
+paths:
+  /inventory:
+    get:
+      consumes:
+      - application/json
+      description: Get all inventory items with pagination, filtering, and sorting
+      parameters:
+      - default: 10
+        description: Number of items per page (max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      - description: Filter by item name (partial match)
+        in: query
+        name: name
+        type: string
+      - description: Filter by minimum stock level
+        in: query
+        name: min_stock
+        type: integer
+      - description: Filter by minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Filter by maximum price
+        in: query
+        name: max_price
+        type: number
+      - default: created_at
+        description: Sort by field (name, stock, price, created_at)
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all items
+      tags:
+      - items
+    post:
+      consumes:
+      - application/json
+      description: Create a new inventory item
+      parameters:
+      - description: Item data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Item'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new item
+      tags:
+      - items
+  /inventory/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an inventory item by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete an item
+      tags:
+      - items
+    get:
+      consumes:
+      - application/json
+      description: Get a specific inventory item by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Item'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get an item by ID
+      tags:
+      - items
+    put:
+      consumes:
+      - application/json
+      description: Update an existing inventory item
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated item data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Item'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update an item
+      tags:
+      - items
+  /inventory/seed:
+    post:
+      consumes:
+      - application/json
+      description: Seed the database with sample data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Seed the database
+      tags:
+      - items
+  /inventory/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics about the inventory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get inventory statistics
+      tags:
+      - items
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
