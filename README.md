@@ -1,141 +1,394 @@
 # Inventory Management API
 
-A high-performance inventory management system with CRUD operations, pagination, filtering, sorting, and rate limiting.
+A **minimalistic** and lightweight inventory management system API built with Go, Gin, and PostgreSQL. Perfect for small to medium businesses that need a simple, fast, and reliable inventory tracking solution.
 
-## ⚠️ Important Note
+## 🚀 Quick Overview
 
-**Please wait 1-2 minutes after starting the server!** The database connection and migrations take time to complete. You'll see "Server starting on port 8080" when it's ready. The API will be available once the connection is established.
+This API provides a clean and efficient way to manage inventory through RESTful endpoints. It supports comprehensive inventory operations with advanced features:
 
-## 📝 Project Disclaimer
+- **Items**: Product inventory with stock tracking
+- **CRUD Operations**: Full create, read, update, delete functionality
+- **Advanced Features**: Pagination, filtering, sorting, and rate limiting
+- **Performance**: High-performance caching with Ristretto
+- **Monitoring**: Built-in health checks and profiling
 
-**This is a simple project to try out Go and Gin framework.** Everything is stored in PostgreSQL with basic caching and no advanced security features. This project was created for educational purposes to explore RESTful APIs with Go.
+## 🛠 Tech Stack
 
-## Tech Stack
-- **Go** ~> 1.23
-- **Gin** Web Framework
-- **PostgreSQL** Database
-- **GORM** ORM
-- **Ristretto** Cache
-- **Docker** (optional)
+- **Backend**: Go 1.23
+- **Web Framework**: Gin
+- **Database**: PostgreSQL 15
+- **ORM**: GORM
+- **Cache**: Ristretto (high-performance)
+- **Testing**: Go testing framework with SQLite
+- **Containerization**: Docker & Docker Compose
+- **Documentation**: Swagger/OpenAPI
 
-## 🐳 Docker (Recommended)
+## API Endpoints
 
-### Basic Version (Local Access)
-```bash
-# Build the Docker image
-docker build -t inventory-api .
-
-# Run with Docker Compose (includes PostgreSQL)
-docker-compose up -d
-```
-
-Access at: **http://localhost:8080**
-
-**Services included:**
-- **API**: http://localhost:8080
-- **PostgreSQL**: localhost:5432
-- **pgAdmin**: http://localhost:5050 (admin@inventory.com / admin)
-
-### Docker Commands
-```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-
-# Clean up (removes volumes)
-docker-compose down -v
-```
-
-## 💻 Manual Installation
-
-### Requirements
-- **Go** ~> 1.23
-- **PostgreSQL** 12 or higher
-- **Git** (for cloning)
-
-### Setup
-```bash
-git clone <repository-url>
-cd inventory-api
-
-# Install dependencies
-go mod tidy
-
-# Create database
-createdb inventory_db
-
-# Run the application
-go run main.go
-```
-
-Access at: **http://localhost:8080**
-
-### Version Check Commands
-```bash
-# Check Go version
-go version
-
-# Check PostgreSQL version
-psql --version
-```
-
-## 🚀 Features
-
-- **CRUD Operations**: Create, Read, Update, Delete inventory items
-- **Pagination**: Cursor-based pagination for large datasets
-- **Filtering**: Filter by name, stock levels, and price ranges
-- **Sorting**: Sort by name, stock, price, or creation date
-- **Rate Limiting**: 1 request per second with burst capacity of 5
-- **Caching**: High-performance Ristretto cache
-- **API Documentation**: Swagger UI at `/api/v1/swagger/index.html`
-
-## 📸 API Endpoints
-
-- `GET /api/v1/inventory` - List all items (with pagination, filtering, sorting)
-- `POST /api/v1/inventory` - Create new item
+### Items
+- `GET /api/v1/inventory` - Get all items (with pagination, filtering, sorting)
 - `GET /api/v1/inventory/:id` - Get item by ID
+- `POST /api/v1/inventory` - Create new item
 - `PUT /api/v1/inventory/:id` - Update item
 - `DELETE /api/v1/inventory/:id` - Delete item
 - `GET /api/v1/inventory/stats` - Get inventory statistics
 - `POST /api/v1/inventory/seed` - Seed database with sample data
-- `GET /health` - Health check
+
+### System
+- `GET /health` - Health check endpoint
 - `GET /api/v1/swagger/index.html` - API documentation
+- `GET /debug/pprof/*` - Performance profiling
 
-## 🔧 Troubleshooting
+## Data Models
 
-### Database Connection Issues
-- Wait 1-2 minutes after starting the server
-- Check logs for "Server starting on port 8080"
-- Ensure PostgreSQL is running: `pg_isready`
-- Check database exists: `psql -l | grep inventory_db`
-
-### Docker Issues
-- Ensure ports 8080 and 5432 are not in use: `docker ps`
-- Stop conflicting containers: `docker stop $(docker ps -q)`
-
-### Manual Installation Issues
-- Ensure Go 1.23+ is installed: `go version`
-- Check PostgreSQL is running: `sudo systemctl status postgresql`
-- Verify database exists: `psql -l | grep inventory_db`
-
-## 📦 File Sizes
-
-- **Docker Image**: ~50MB (compressed)
-- **Source Code**: ~2MB
-- **Dependencies**: ~100MB (first build only)
-
-## 🎯 Quick Start
-
-**Fastest way to get started:**
-```bash
-docker-compose up -d
+### Item
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Smartphone",
+  "stock": 40,
+  "price": 699.99,
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
 ```
 
-Then open **http://localhost:8080** and wait 1-2 minutes for the database connection to establish!
+### Create Item Request
+```json
+{
+  "name": "Laptop",
+  "stock": 50,
+  "price": 999.99
+}
+```
 
-**API Documentation**: http://localhost:8080/api/v1/swagger/index.html
+### Update Item Request
+```json
+{
+  "name": "Gaming Laptop",
+  "stock": 25,
+  "price": 1299.99
+}
+```
+
+### Paginated Response
+```json
+{
+  "data": [...],
+  "pagination": {
+    "next_cursor": "eyJpZCI6IjU1MGU4NDAwLWUyOWItNDFkNC1hNzE2LTQ0NjY1NTQ0MDAwMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTAxLTAxVDAwOjAwOjAwWiJ9",
+    "has_more": true,
+    "total": 100
+  }
+}
+```
+
+## 📋 Prerequisites
+
+### For Local Development (without Docker)
+- **Go 1.23** or higher
+- **PostgreSQL 15** or higher
+- Git
+
+### For Docker Deployment
+- **Docker** 20.10+
+- **Docker Compose** 2.0+
+
+## 🚀 Getting Started
+
+Choose your preferred setup method:
+
+- [**Local Development**](#-local-development-setup) - Run directly on your machine
+- [**Docker Development**](#-docker-development-setup) - Run with Docker Compose
+
+---
+
+## 💻 Local Development Setup
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/levo-777/inventory_api.git
+cd inventory_api
+```
+
+### 2. Install Go Dependencies
+```bash
+go mod download
+```
+
+### 3. Environment Configuration
+```bash
+# Copy environment template
+cp env.example .env
+
+# Edit with your database settings
+nano .env
+```
+
+**Required environment variables:**
+```env
+ENV=development
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=inventory_db
+SERVER_PORT=8080
+RATE_LIMIT_REQUESTS=1
+RATE_LIMIT_BURST=5
+```
+
+### 4. Database Setup
+```bash
+# Start PostgreSQL service
+sudo systemctl start postgresql
+
+# Create database
+psql -U postgres -c "CREATE DATABASE inventory_db;"
+```
+
+### 5. Run the Application
+```bash
+# Start the API server
+go run main.go
+```
+
+✅ **API available at:** `http://localhost:8080`
+
+---
+
+## 🐳 Docker Development Setup
+
+### Quick Start (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/levo-777/inventory_api.git
+cd inventory_api
+
+# Start all services with Docker Compose
+docker-compose up -d
+
+# Check service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+```
+
+✅ **API available at:** `http://localhost:8080`
+✅ **pgAdmin available at:** `http://localhost:5050`
+
+## 📖 API Usage Examples
+
+### Create an Item
+```bash
+curl -X POST http://localhost:8080/api/v1/inventory \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Gaming Laptop",
+    "stock": 25,
+    "price": 1299.99
+  }'
+```
+
+### Get All Items (with pagination)
+```bash
+curl "http://localhost:8080/api/v1/inventory?limit=10&sort=name&order=asc"
+```
+
+### Get Items with Filtering
+```bash
+# Filter by name
+curl "http://localhost:8080/api/v1/inventory?name=laptop"
+
+# Filter by minimum stock
+curl "http://localhost:8080/api/v1/inventory?min_stock=50"
+```
+
+### Update an Item
+```bash
+curl -X PUT http://localhost:8080/api/v1/inventory/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Laptop",
+    "stock": 30,
+    "price": 1199.99
+  }'
+```
+
+### Get Item by ID
+```bash
+curl http://localhost:8080/api/v1/inventory/550e8400-e29b-41d4-a716-446655440000
+```
+
+### Get Inventory Statistics
+```bash
+curl http://localhost:8080/api/v1/inventory/stats
+```
+
+### Seed Database with Sample Data
+```bash
+curl -X POST http://localhost:8080/api/v1/inventory/seed
+```
+
+### Health Check
+```bash
+curl http://localhost:8080/health
+```
+
+## 🔧 Advanced Features
+
+### Pagination
+- **Cursor-based pagination** for efficient large dataset handling
+- Use `limit` parameter to control page size
+- Use `cursor` parameter for next page navigation
+
+### Filtering
+- **By name**: `?name=keyword`
+- **By minimum stock**: `?min_stock=50`
+
+### Sorting
+- **Sort by**: `name`, `stock`, `price`, `created_at`
+- **Order**: `asc` or `desc`
+- Example: `?sort=price&order=desc`
+
+### Rate Limiting
+- **1 request per second** with burst capacity of 5
+- Applied to all API endpoints except health and documentation
+
+### Caching
+- **High-performance Ristretto cache** for frequently accessed items
+- Automatic cache invalidation on updates
+- 5-minute TTL for cached items
+
+## 🧪 Testing
+
+### Run Unit Tests
+```bash
+go test ./...
+```
+
+### Run Integration Tests
+```bash
+go test ./test/integrations/...
+```
+
+### Run with Coverage
+```bash
+go test -cover ./...
+```
+
+## 📊 Monitoring & Profiling
+
+### Health Check
+```bash
+curl http://localhost:8080/health
+```
+
+### Performance Profiling
+```bash
+# CPU profile
+curl http://localhost:8080/debug/pprof/profile
+
+# Memory profile
+curl http://localhost:8080/debug/pprof/heap
+
+# Goroutine profile
+curl http://localhost:8080/debug/pprof/goroutine
+```
+
+### API Documentation
+Visit `http://localhost:8080/api/v1/swagger/index.html` for interactive API documentation.
+
+## 🚀 Production Deployment
+
+### Docker Production Build
+```bash
+# Build production image
+docker build -t inventory-api .
+
+# Run with production environment
+docker run -d \
+  --name inventory-api \
+  -p 8080:8080 \
+  --env-file docker.env \
+  inventory-api
+```
+
+### Environment Variables for Production
+```env
+ENV=production
+GIN_MODE=release
+DB_HOST=your-db-host
+DB_PORT=5432
+DB_USER=your-db-user
+DB_PASSWORD=your-secure-password
+DB_NAME=inventory_db
+SERVER_PORT=8080
+RATE_LIMIT_REQUESTS=10
+RATE_LIMIT_BURST=20
+```
+
+## 📁 Project Structure
+
+```
+inventory-api/
+├── controllers/          # HTTP handlers
+├── models/              # Data models and DTOs
+├── routes/              # Route definitions
+├── utils/               # Utilities (config, database, cache, etc.)
+├── migrations/          # Database migrations
+├── test/                # Test files
+│   └── integrations/    # Integration tests
+├── docs/                # Generated Swagger documentation
+├── main.go              # Application entry point
+├── docker-compose.yml   # Docker services
+├── Dockerfile           # Container definition
+└── README.md           # This file
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**Database Connection Failed**
+```bash
+# Check if PostgreSQL is running
+sudo systemctl status postgresql
+
+# Verify database exists
+psql -U postgres -l | grep inventory_db
+```
+
+**Port Already in Use**
+```bash
+# Kill process using port 8080
+sudo lsof -ti:8080 | xargs kill -9
+
+# Or use a different port
+SERVER_PORT=8081 go run main.go
+```
+
+**Rate Limit Exceeded**
+- Wait 1 second between requests
+- Use burst capacity (up to 5 requests quickly)
+- Check rate limit headers in response
+
+### Getting Help
+
+- Check the [API Documentation](http://localhost:8080/api/v1/swagger/index.html)
+- Review the health check endpoint: `GET /health`
+- Check application logs for detailed error messages
