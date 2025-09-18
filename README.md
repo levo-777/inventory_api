@@ -1,6 +1,6 @@
 # Inventory Management API
 
-A **minimalistic** and lightweight inventory management system API built with Go, Gin, and PostgreSQL. Perfect for small to medium businesses that need a simple, fast, and reliable inventory tracking solution.
+A inventory management system API with CRUD operations, pagination, filtering, sorting, and rate limiting
 
 ## 🚀 Quick Overview
 
